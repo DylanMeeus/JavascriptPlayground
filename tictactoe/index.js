@@ -21,9 +21,9 @@ class Game {
 
     handleClick(e) {
         const ctx = getContext();
-
         const clickedTile = this.tiles.filter(t => ctx.isPointInPath(t.shape, e.offsetX, e.offsetY))[0];
         this.addPlayer(clickedTile, this.player);
+        checkWin();
     }
 
     // add a player to a given tile
@@ -42,6 +42,9 @@ class Game {
         ctx.fillStyle = this.player == 0 ? "green" : "blue";
         ctx.fill(tile.shape);
         this.player = (this.player+1) % 2;
+    }
+
+    checkWin() {
     }
 }
 
