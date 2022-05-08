@@ -3,16 +3,31 @@ const HEIGHT = 600;
 const WIDTH = 600;
 const BOARD_SIZE = 3; // X by X, e.g BOARD_SIZE = 3, tiles = 9 (3x3)
 
-
-// vars
-var tiles = [];
-
 // game functions
 
 
+var game = null; // Should try to avoid null here, this is a bit dirty
 
 
 // render functions
+
+class Game {
+
+    constructor(tiles){
+        this.tiles = tiles;
+    }
+
+    handleClick(e) {
+        // determine location
+        // place a circle / square
+        const ctx = getContext();
+
+        const clickedTile = this.tiles.filter(t => ctx.isPointInPath(t.shape, e.offsetX, e.offsetY))[0];
+        ctx.fillStyle = "green";
+        ctx.fill(clickedTile.shape);
+    }
+
+}
 
 
 class GameShape {
@@ -22,11 +37,13 @@ class GameShape {
     }
 }
 
-function render() {
+function start() {
     const canvas = document.querySelector('#canvas'); 
-    canvas.addEventListener('click', handleClick); 
 
-    renderField();
+    let tiles = createField();
+    game = new Game(tiles);
+
+    canvas.addEventListener('click', (e) =>  game.handleClick(e) ); 
 }
 
 function getContext() {
@@ -36,11 +53,12 @@ function getContext() {
 }
 
 
-function renderField() {
+function createField() {
     const ctx = getContext(); 
 
     let rectHeight = HEIGHT / BOARD_SIZE;
     let rectWidth = WIDTH / BOARD_SIZE;
+    const tiles = []
 
     for (let row = 0; row < BOARD_SIZE; row++) {
         for (let col = 0; col < BOARD_SIZE; col++) {
@@ -51,18 +69,9 @@ function renderField() {
             tiles.push(g);
         }
     }
+
+    return tiles;
 }
 
-
-function handleClick(e) {
-    // determine location
-    // place a circle / square
-    const ctx = getContext();
-
-    const clickedTile = tiles.filter(t => ctx.isPointInPath(t.shape, e.offsetX, e.offsetY))[0];
-    console.log(clickedTile);
-    ctx.fillStyle = "green";
-    ctx.fill(clickedTile.shape);
-}
 
 
