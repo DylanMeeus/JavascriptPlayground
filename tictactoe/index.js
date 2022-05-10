@@ -23,7 +23,8 @@ class Game {
         const ctx = getContext();
         const clickedTile = this.tiles.filter(t => ctx.isPointInPath(t.shape, e.offsetX, e.offsetY))[0];
         this.addPlayer(clickedTile, this.player);
-        checkWin();
+        this.checkWin();
+        this.player = (this.player+1) % 2;
     }
 
     // add a player to a given tile
@@ -41,10 +42,35 @@ class Game {
         const ctx = getContext()
         ctx.fillStyle = this.player == 0 ? "green" : "blue";
         ctx.fill(tile.shape);
-        this.player = (this.player+1) % 2;
     }
 
     checkWin() {
+        this.checkHorizontal();
+    }
+
+
+    checkHorizontal() {
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            let values = [];
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                let position = array2dto1d(row, col)
+                let value = this.gameField.get(position)
+                values.push(value);
+            }
+            let player = this.player;
+            console.log(values);
+            console.log(player);
+            if (all(values, function(x) { return x == player })) {
+                alert("player " + this.player + "wins");
+            }
+             break;
+        }
+    }
+
+    checkVertical() {
+    }
+
+    checkDiagonal() {
     }
 }
 
@@ -85,7 +111,7 @@ function createField() {
             const path = new Path2D();
             path.rect(rectHeight * row, rectWidth * col, rectHeight, rectWidth);
             ctx.stroke(path);
-            const g = new GameShape(row + (col * BOARD_SIZE), path); // map 2d to 1d array
+            const g = new GameShape(array2dto1d(row,col), path); // map 2d to 1d array
             tiles.push(g);
         }
     }
@@ -94,4 +120,13 @@ function createField() {
 }
 
 
+function array2dto1d(row, col) {
+    return row + (col * BOARD_SIZE);
+}
 
+
+// all returns true if all values in xs match the predicate
+function all(xs, predicate) {
+    console.log(xs.filter(x => predicate(x)));
+    return xs.filter(x => predicate(x)).length == xs.length;
+}
