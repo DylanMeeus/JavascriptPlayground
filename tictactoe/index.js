@@ -33,7 +33,7 @@ class Game {
 
         const fieldTaken = value > -1;
         if (fieldTaken) {
-            console.log("can't place a tile here you :(");
+            console.log("can't place a tile here!"); 
             return;
         }
 
@@ -45,7 +45,7 @@ class Game {
     }
 
     checkWin() {
-        if (this.checkHorizontal() || this.checkVertical()) {
+        if (this.checkHorizontal() || this.checkVertical() || this.checkDiagonal()) {
             alert("player: " + this.player + " won");
         }
     }
@@ -84,6 +84,29 @@ class Game {
     }
 
     checkDiagonal() {
+        let values = [];
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            let position = array2dto1d(i, i)
+            let value = this.gameField.get(position)
+            values.push(value);
+        }
+        let player = this.player;
+        if (all(values, function(x) { return x == player })) {
+            return true;
+        }
+        
+        // scan right-top to left-bottom
+        values = [];
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            let col = BOARD_SIZE - 1 - row;
+            let position = array2dto1d(row, col)
+            let value = this.gameField.get(position)
+            values.push(value);
+        }
+        if (all(values, function(x) { return x == player })) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -140,6 +163,5 @@ function array2dto1d(row, col) {
 
 // all returns true if all values in xs match the predicate
 function all(xs, predicate) {
-    console.log(xs.filter(x => predicate(x)));
     return xs.filter(x => predicate(x)).length == xs.length;
 }
