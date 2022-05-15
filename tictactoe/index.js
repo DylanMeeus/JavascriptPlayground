@@ -45,11 +45,29 @@ class Game {
     }
 
     checkWin() {
-        this.checkHorizontal();
+        if (this.checkHorizontal() || this.checkVertical()) {
+            alert("player: " + this.player + " won");
+        }
     }
 
 
     checkHorizontal() {
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            let values = [];
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                let position = array2dto1d(col, row)
+                let value = this.gameField.get(position)
+                values.push(value);
+            }
+            let player = this.player;
+            if (all(values, function(x) { return x == player })) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    checkVertical() {
         for (let row = 0; row < BOARD_SIZE; row++) {
             let values = [];
             for (let col = 0; col < BOARD_SIZE; col++) {
@@ -58,16 +76,11 @@ class Game {
                 values.push(value);
             }
             let player = this.player;
-            console.log(values);
-            console.log(player);
             if (all(values, function(x) { return x == player })) {
-                alert("player " + this.player + "wins");
+                return true;
             }
-             break;
         }
-    }
-
-    checkVertical() {
+        return false;
     }
 
     checkDiagonal() {
@@ -121,7 +134,7 @@ function createField() {
 
 
 function array2dto1d(row, col) {
-    return row + (col * BOARD_SIZE);
+    return (row * BOARD_SIZE) + col; 
 }
 
 
