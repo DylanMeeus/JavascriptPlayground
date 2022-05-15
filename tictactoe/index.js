@@ -3,11 +3,7 @@ const HEIGHT = 600;
 const WIDTH = 600;
 const BOARD_SIZE = 3; // X by X, e.g BOARD_SIZE = 3, tiles = 9 (3x3)
 
-// game functions
-
-
 var game = null; // Should try to avoid null here, this is a bit dirty
-
 
 class Game {
 
@@ -22,7 +18,9 @@ class Game {
     handleClick(e) {
         const ctx = getContext();
         const clickedTile = this.tiles.filter(t => ctx.isPointInPath(t.shape, e.offsetX, e.offsetY))[0];
-        this.addPlayer(clickedTile, this.player);
+        if (!this.addPlayer(clickedTile, this.player)) {
+            return;
+        }
         this.checkWin();
         this.player = (this.player+1) % 2;
     }
@@ -34,7 +32,7 @@ class Game {
         const fieldTaken = value > -1;
         if (fieldTaken) {
             console.log("can't place a tile here!"); 
-            return;
+            return false;
         }
 
         this.gameField.set(tile.gameLocation, player);
@@ -42,6 +40,7 @@ class Game {
         const ctx = getContext()
         ctx.fillStyle = this.player == 0 ? "green" : "blue";
         ctx.fill(tile.shape);
+        return true;
     }
 
     checkWin() {
@@ -51,11 +50,11 @@ class Game {
     }
 
 
-    checkHorizontal() {
+    boardIterator(isHorizontal) {
         for (let row = 0; row < BOARD_SIZE; row++) {
             let values = [];
             for (let col = 0; col < BOARD_SIZE; col++) {
-                let position = array2dto1d(col, row)
+                let position = this.derivePosition(row, col, isHorizontal);
                 let value = this.gameField.get(position)
                 values.push(value);
             }
@@ -67,20 +66,19 @@ class Game {
         return false;
     }
 
-    checkVertical() {
-        for (let row = 0; row < BOARD_SIZE; row++) {
-            let values = [];
-            for (let col = 0; col < BOARD_SIZE; col++) {
-                let position = array2dto1d(row, col)
-                let value = this.gameField.get(position)
-                values.push(value);
-            }
-            let player = this.player;
-            if (all(values, function(x) { return x == player })) {
-                return true;
-            }
+    derivePosition(row, col, isHorizontal) {
+        if (isHorizontal) {
+            return array2dto1d(col, row);
         }
-        return false;
+        return array2dto1d(row, col);
+    }
+
+    checkHorizontal() {
+        return this.boardIterator(true);
+    }
+
+    checkVertical() {
+        return this.boardIterator(false);
     }
 
     checkDiagonal() {
